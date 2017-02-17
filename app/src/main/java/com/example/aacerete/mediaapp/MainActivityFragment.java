@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
@@ -31,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
+import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -44,14 +46,13 @@ public class MainActivityFragment extends Fragment {
     //instanciamos db firebase
     FirebaseDatabase database;
 
-    //referencia
-    private StorageReference mStorageRef;
     private FirebaseListAdapter mAdapter;
     File f;
 
     //ruta de la imagen
     String mCurrentPhotoPath;
-    static final int REQUEST_TAKE_PHOTO = 1;
+    private static final int REQUEST_TAKE_PHOTO = 1;
+    private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 2;
 
     public MainActivityFragment() {
     }
@@ -60,13 +61,14 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //Cargamos la imagen
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-
 
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         btnFoto = (Button) view.findViewById(R.id.btnFoto);
+        btnVideo = (Button) view.findViewById(R.id.btnVideo);
+
+
+        //al darle al boton de foto, abrimos camara
         btnFoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,9 +77,20 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
+        btnVideo.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                TakeVideoIntent();
+
+            }
+        });
+
         gvImages = (GridView) view.findViewById(R.id.gvImages);
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+
+        //Adaptador del gridview
         mAdapter = new FirebaseListAdapter<Gallery>(getActivity(), Gallery.class, R.layout.gv_item, ref) {
+
             @Override
             protected void populateView(View view, Gallery item, int position) {
                 ImageView img = (ImageView) view.findViewById(R.id.imageView);
@@ -93,16 +106,15 @@ public class MainActivityFragment extends Fragment {
         return view;
     }
 
-    private File createImageFile() throws IOException {
+    private File createMediaFile(String format, File directori) throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
+        String fileName = "Media" + timeStamp + "_";
+
         File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
+                fileName,  /* prefix */
+                format,         /* suffix */
+                directori      /* directory */
         );
 
         // Save a file: path for use with ACTION_VIEW intents
@@ -115,14 +127,19 @@ public class MainActivityFragment extends Fragment {
 
 
 
+
     private void TakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
             // Create the File where the photo should go
             File photoFile = null;
+
             try {
-                photoFile = createImageFile();
+                File storageDir = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES);
+                photoFile = createMediaFile(".jpg" , storageDir);
+
             } catch (IOException ex) {
 
 
@@ -136,6 +153,41 @@ public class MainActivityFragment extends Fragment {
             }
         }
     }
+
+    private void TakeVideoIntent(){
+
+        //create new Intent
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+
+        if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File videoFile = null;
+
+            try {
+                File storageDir = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_MOVIES);
+                videoFile = createMediaFile(".mp4" , storageDir);
+
+            } catch (IOException ex) {
+
+
+            }
+            // Continue only if the File was successfully created
+            if (videoFile != null) {
+
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, videoFile);
+                // set the image file name
+                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+                // set the video image quality to high
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(videoFile));
+                startActivityForResult(intent, CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE);
+                f = videoFile;
+            }
+        }
+    }
+
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -153,8 +205,17 @@ public class MainActivityFragment extends Fragment {
 
 
                 }
+
+            case CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    // Video capturado y guardado en el movil
+
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                    Gallery msg = new Gallery(f.getName(), f.getAbsolutePath());
+                    ref.push().setValue(msg);
+                }
+
+
         }
-
-
     }
 }
