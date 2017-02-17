@@ -9,30 +9,36 @@
     tools:showIn="@layout/activity_main">
 
     <Button
-        android:text="Button"
-        android:layout_width="wrap_content"
+        android:text="Video"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/btnVideo"
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintBottom_creator="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         android:layout_marginRight="32dp"
-        android:layout_marginEnd="32dp" />
+        android:layout_marginEnd="32dp"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline2"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp" />
 
     <Button
-        android:text="Button"
-        android:layout_width="wrap_content"
+        android:text="Foto"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/btnFoto"
         tools:layout_constraintBottom_creator="1"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_constraintLeft_creator="1"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="24dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginLeft="32dp"
-        android:layout_marginStart="32dp" />
+        android:layout_marginStart="32dp"
+        app:layout_constraintRight_toLeftOf="@+id/guideline2"
+        android:layout_marginEnd="32dp"
+        android:layout_marginRight="32dp" />
 
     <GridView
         android:layout_width="351dp"
@@ -50,12 +56,21 @@
         android:id="@+id/gvImages" />
 
     <android.support.constraint.Guideline
-        android:layout_width="wrap_content"
+        android:layout_width="384dp"
         android:layout_height="wrap_content"
         android:id="@+id/guideline"
-        app:layout_constraintGuide_begin="346dp"
+        app:layout_constraintGuide_begin="366dp"
         android:orientation="horizontal"
-        tools:layout_editor_absoluteY="346dp"
+        tools:layout_editor_absoluteY="366dp"
         tools:layout_editor_absoluteX="0dp" />
+
+    <android.support.constraint.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="455dp"
+        android:id="@+id/guideline2"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="194dp"
+        app:layout_constraintGuide_percent="0.5052083" />
 
 </android.support.constraint.ConstraintLayout>

@@ -157,9 +157,9 @@ public class MainActivityFragment extends Fragment {
     private void TakeVideoIntent(){
 
         //create new Intent
-        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        Intent takeVidIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
 
-        if (intent.resolveActivity(getContext().getPackageManager()) != null) {
+        if (takeVidIntent.resolveActivity(getContext().getPackageManager()) != null) {
             // Create the File where the photo should go
             File videoFile = null;
 
@@ -175,13 +175,14 @@ public class MainActivityFragment extends Fragment {
             // Continue only if the File was successfully created
             if (videoFile != null) {
 
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, videoFile);
+                takeVidIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoFile);
                 // set the image file name
-                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+                takeVidIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
                 // set the video image quality to high
-                intent.putExtra(MediaStore.EXTRA_OUTPUT,
+                takeVidIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         Uri.fromFile(videoFile));
-                startActivityForResult(intent, CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE);
+                startActivityForResult(takeVidIntent, CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE);
+
                 f = videoFile;
             }
         }
