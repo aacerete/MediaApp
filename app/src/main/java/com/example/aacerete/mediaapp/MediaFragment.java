@@ -26,6 +26,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -37,7 +39,7 @@ import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MediaFragment extends Fragment {
 
     private Button btnFoto;
     private Button btnVideo;
@@ -54,7 +56,7 @@ public class MainActivityFragment extends Fragment {
     private static final int REQUEST_TAKE_PHOTO = 1;
     private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 2;
 
-    public MainActivityFragment() {
+    public MediaFragment() {
     }
 
     @Override
