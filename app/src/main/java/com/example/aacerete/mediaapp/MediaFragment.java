@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.location.LocationManager;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
@@ -44,6 +45,7 @@ public class MediaFragment extends Fragment {
     private Button btnFoto;
     private Button btnVideo;
     private GridView gvImages;
+    GPSTracker gps;
 
     //instanciamos db firebase
     FirebaseDatabase database;
@@ -199,9 +201,21 @@ public class MediaFragment extends Fragment {
 
         switch (requestCode) {
             case REQUEST_TAKE_PHOTO:
+                gps = new GPSTracker(this.getContext());
                 if (resultCode == RESULT_OK) {
                     // La imagen ha sido guardada en el móvil..
+                    if(gps.canGetLocation())
+                    {
+                        double latitude = gps.getLatitude();
+                        double longitude = gps.getLongitude();
 
+                        // \n is for new line
+                        Toast.makeText(getActivity().getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+                    } else {
+                        // Can't get location.
+                        // GPS or network is not enabled.
+                        // Ask user to enable GPS/network in settings.
+                    }
                     // Envíamos la referencia a la db realtime, para rellenar el gridview
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                     Gallery msg = new Gallery(f.getName(), f.getAbsolutePath());
