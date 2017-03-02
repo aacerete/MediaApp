@@ -253,6 +253,7 @@ public class MediaFragment extends Fragment {
                     if (gps.canGetLocation()) {
                         double latitude = gps.getLatitude();
                         double longitude = gps.getLongitude();
+
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
                         Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(), latitude, longitude, extension);
 
