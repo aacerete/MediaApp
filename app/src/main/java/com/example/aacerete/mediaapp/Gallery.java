@@ -18,6 +18,13 @@ public class Gallery {
         this.absolute = absolute;
     }
 
+    public Gallery(String name, String absolute, double latitude, double longitude) {
+        this.name = name;
+        this.absolute = absolute;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+
     public double getLatitude() {
         return latitude;
     }

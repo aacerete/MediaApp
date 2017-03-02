@@ -28,7 +28,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -81,7 +80,7 @@ public class MediaFragment extends Fragment {
             }
         });
 
-        btnVideo.setOnClickListener(new View.OnClickListener(){
+        btnVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TakeVideoIntent();
@@ -131,8 +130,6 @@ public class MediaFragment extends Fragment {
     }
 
 
-
-
     private void TakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -143,7 +140,7 @@ public class MediaFragment extends Fragment {
             try {
                 File storageDir = Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_PICTURES);
-                photoFile = createMediaFile(".jpg" , storageDir);
+                photoFile = createMediaFile(".jpg", storageDir);
 
             } catch (IOException ex) {
 
@@ -159,7 +156,7 @@ public class MediaFragment extends Fragment {
         }
     }
 
-    private void TakeVideoIntent(){
+    private void TakeVideoIntent() {
 
         //create new Intent
         Intent takeVidIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
@@ -171,7 +168,7 @@ public class MediaFragment extends Fragment {
             try {
                 File storageDir = Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_MOVIES);
-                videoFile = createMediaFile(".mp4" , storageDir);
+                videoFile = createMediaFile(".mp4", storageDir);
 
             } catch (IOException ex) {
 
@@ -194,46 +191,75 @@ public class MediaFragment extends Fragment {
     }
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
+
             case REQUEST_TAKE_PHOTO:
                 gps = new GPSTracker(this.getContext());
                 if (resultCode == RESULT_OK) {
                     // La imagen ha sido guardada en el móvil..
-                    if(gps.canGetLocation())
-                    {
+                    if (gps.canGetLocation()) {
                         double latitude = gps.getLatitude();
                         double longitude = gps.getLongitude();
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(), latitude, longitude);
 
+                        // Envíamos la referencia a la db realtime, para rellenar el gridview
+                        ref.push().setValue(msg);
                         // \n is for new line
-                        Toast.makeText(getActivity().getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity().getApplicationContext(), "La Geolocalización de la foto es - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+
+
                     } else {
                         // Can't get location.
                         // GPS or network is not enabled.
                         // Ask user to enable GPS/network in settings.
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath());
+
+                        // Envíamos la referencia a la db realtime, para rellenar el gridview
+                        ref.push().setValue(msg);
+
+                        Toast.makeText(getActivity().getApplicationContext(), "No se ha podido guardar la geolocalización de la fotografia ", Toast.LENGTH_LONG).show();
                     }
-                    // Envíamos la referencia a la db realtime, para rellenar el gridview
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                    Gallery msg = new Gallery(f.getName(), f.getAbsolutePath());
-                    ref.push().setValue(msg);
 
 
                 }
+
+                break;
 
             case CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     // Video capturado y guardado en el movil
+                    if (gps.canGetLocation()) {
+                        double latitude = gps.getLatitude();
+                        double longitude = gps.getLongitude();
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(), latitude, longitude);
 
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                    Gallery msg = new Gallery(f.getName(), f.getAbsolutePath());
-                    ref.push().setValue(msg);
+                        // Envíamos la referencia a la db realtime, para rellenar el gridview
+                        ref.push().setValue(msg);
+                        // \n is for new line
+                        Toast.makeText(getActivity().getApplicationContext(), "La Geolocalización del video es - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+                    } else {
+                        // Can't get location.
+                        // GPS or network is not enabled.
+                        // Ask user to enable GPS/network in settings.
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath());
+
+                        // Envíamos la referencia a la db realtime, para rellenar el gridview
+                        ref.push().setValue(msg);
+
+                        Toast.makeText(getActivity().getApplicationContext(), "No se ha podido guardar la geolocalización del video", Toast.LENGTH_LONG).show();
+                    }
+
                 }
 
-
+                break;
         }
     }
 }
