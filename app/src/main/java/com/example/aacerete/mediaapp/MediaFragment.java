@@ -113,6 +113,7 @@ public class MediaFragment extends Fragment {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String fileName = "Media" + timeStamp + "_";
 
+
         File image = File.createTempFile(
                 fileName,  /* prefix */
                 format,         /* suffix */
