@@ -1,11 +1,9 @@
 package com.example.aacerete.mediaapp;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,17 +13,11 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.location.LocationManager;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 
 import java.io.File;
@@ -34,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
-import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
+import static com.firebase.ui.database.FirebaseListAdapter.*;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -47,7 +39,7 @@ public class MediaFragment extends Fragment {
     GPSTracker gps;
 
     //instanciamos db firebase
-    FirebaseDatabase database;
+
 
     private FirebaseListAdapter mAdapter;
     File f;
@@ -56,6 +48,7 @@ public class MediaFragment extends Fragment {
     String mCurrentPhotoPath;
     private static final int REQUEST_TAKE_PHOTO = 1;
     private static final int CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE = 2;
+    private static final int IMAGE_VIEW_ACTIVITY_REQUEST_CODE = 3;
 
     public MediaFragment() {
     }
@@ -89,20 +82,37 @@ public class MediaFragment extends Fragment {
         });
 
         gvImages = (GridView) view.findViewById(R.id.gvImages);
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+
+
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
 
         //Adaptador del gridview
         mAdapter = new FirebaseListAdapter<Gallery>(getActivity(), Gallery.class, R.layout.gv_item, ref) {
 
             @Override
-            protected void populateView(View view, Gallery item, int position) {
+            protected void populateView(View view, final Gallery item, final int position) {
                 ImageView img = (ImageView) view.findViewById(R.id.imageView);
+
+
                 Glide.with(getContext()).load(Uri.fromFile(new File(item.absolute)))
                         .centerCrop()
                         .crossFade()
                         .into(img);
+
+                img.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        System.out.println(item.extension);
+                        Gallery gallery = getItem(position);
+                        openMedia(item.getAbsolute(), item.getExtension());
+                    }
+                });
             }
+
+
+
         };
+
         gvImages.setAdapter(mAdapter);
 
 
@@ -201,11 +211,14 @@ public class MediaFragment extends Fragment {
                 gps = new GPSTracker(this.getContext());
                 if (resultCode == RESULT_OK) {
                     // La imagen ha sido guardada en el móvil..
+                    String extension = "jpg";
+
                     if (gps.canGetLocation()) {
                         double latitude = gps.getLatitude();
                         double longitude = gps.getLongitude();
+
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(), latitude, longitude);
+                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(), latitude, longitude, extension);
 
                         // Envíamos la referencia a la db realtime, para rellenar el gridview
                         ref.push().setValue(msg);
@@ -218,7 +231,7 @@ public class MediaFragment extends Fragment {
                         // GPS or network is not enabled.
                         // Ask user to enable GPS/network in settings.
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath());
+                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(),extension);
 
                         // Envíamos la referencia a la db realtime, para rellenar el gridview
                         ref.push().setValue(msg);
@@ -234,11 +247,14 @@ public class MediaFragment extends Fragment {
             case CAPTURE_VIDEO_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     // Video capturado y guardado en el movil
+
+                    String extension = "mp4";
+
                     if (gps.canGetLocation()) {
                         double latitude = gps.getLatitude();
                         double longitude = gps.getLongitude();
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(), latitude, longitude);
+                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(), latitude, longitude, extension);
 
                         // Envíamos la referencia a la db realtime, para rellenar el gridview
                         ref.push().setValue(msg);
@@ -249,7 +265,7 @@ public class MediaFragment extends Fragment {
                         // GPS or network is not enabled.
                         // Ask user to enable GPS/network in settings.
                         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath());
+                        Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(),extension);
 
                         // Envíamos la referencia a la db realtime, para rellenar el gridview
                         ref.push().setValue(msg);
@@ -262,4 +278,25 @@ public class MediaFragment extends Fragment {
                 break;
         }
     }
+
+    public void openMedia(String url, String extension) {
+        File file = new File(url);
+
+        String type = null;
+
+        switch (extension) {
+            case "mp4":
+                type = "video/" + extension;
+                break;
+            case "jpg":
+                type = "image/" + extension;
+        }
+
+        Intent i = new Intent();
+        i.setAction(Intent.ACTION_VIEW);
+        i.setDataAndType(Uri.fromFile(file), type);
+
+        startActivityForResult(i, IMAGE_VIEW_ACTIVITY_REQUEST_CODE);
+    }
+
 }

@@ -6,6 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -18,8 +21,9 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 public class MapFragment extends android.support.v4.app.Fragment {
 
-    private org.osmdroid.views.MapView mvMap;
 
+
+    private org.osmdroid.views.MapView mvMap;
     private IMapController mapController;
     private MyLocationNewOverlay myLocationOverlay;
 
@@ -53,6 +57,13 @@ public class MapFragment extends android.support.v4.app.Fragment {
 
         return view;
 
+    }
+
+    private void putMarkers(){
+
+        setupMarkerOverlay();
+
+
 
     }
 
@@ -79,6 +90,7 @@ public class MapFragment extends android.support.v4.app.Fragment {
         mapController.setCenter(new GeoPoint(41.383333, 2.183333));
         mapController.setZoom(15);
     }
+
 
 
 
