@@ -6,7 +6,7 @@
 
     <ImageView
         android:layout_height="100dp"
-        app:srcCompat="@drawable/common_google_signin_btn_icon_dark_disabled"
+        app:srcCompat="@drawable/common_google_signin_btn_text_dark_normal"
         android:id="@+id/imageView"
         android:layout_width="100dp" />
 </LinearLayout>

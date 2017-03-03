@@ -37,7 +37,7 @@ public class MapFragment extends android.support.v4.app.Fragment {
     private RadiusMarkerClusterer mediaMarkerClusterer;
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference myRef = database.getInstance().getReference();
+    DatabaseReference myRef;
 
     public MapFragment() {
         // Required empty public constructor
@@ -53,7 +53,7 @@ public class MapFragment extends android.support.v4.app.Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
-
+        myRef = database.getInstance().getReference().child(((MainActivity) getActivity()).getToken());
         mvMap = (org.osmdroid.views.MapView) view.findViewById(R.id.mvMap);
 
         initializeMap();

@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
+import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -83,8 +84,7 @@ public class MediaFragment extends Fragment {
 
         gvImages = (GridView) view.findViewById(R.id.gvImages);
 
-
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child(((MainActivity) getActivity()).getToken());
 
         //Adaptador del gridview
         mAdapter = new FirebaseListAdapter<Gallery>(getActivity(), Gallery.class, R.layout.gv_item, ref) {
@@ -217,7 +217,7 @@ public class MediaFragment extends Fragment {
                         double latitude = gps.getLatitude();
                         double longitude = gps.getLongitude();
 
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child( ((MainActivity) getActivity()).getToken() );
                         Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(), latitude, longitude, extension);
 
                         // Envíamos la referencia a la db realtime, para rellenar el gridview
@@ -230,7 +230,7 @@ public class MediaFragment extends Fragment {
                         // Can't get location.
                         // GPS or network is not enabled.
                         // Ask user to enable GPS/network in settings.
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child( ((MainActivity) getActivity()).getToken() );
                         Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(),extension);
 
                         // Envíamos la referencia a la db realtime, para rellenar el gridview
@@ -254,7 +254,7 @@ public class MediaFragment extends Fragment {
                         double latitude = gps.getLatitude();
                         double longitude = gps.getLongitude();
 
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child( ((MainActivity) getActivity()).getToken() );
                         Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(), latitude, longitude, extension);
 
                         // Envíamos la referencia a la db realtime, para rellenar el gridview
@@ -265,7 +265,7 @@ public class MediaFragment extends Fragment {
                         // Can't get location.
                         // GPS or network is not enabled.
                         // Ask user to enable GPS/network in settings.
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child( ((MainActivity) getActivity()).getToken() );
                         Gallery msg = new Gallery(f.getName(), f.getAbsolutePath(),extension);
 
                         // Envíamos la referencia a la db realtime, para rellenar el gridview
